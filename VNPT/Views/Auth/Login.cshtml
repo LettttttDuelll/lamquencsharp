@@ -1,0 +1,279 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập | Phản ánh Kiến nghị";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/img/logo_no_text.png" type="image/png" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login-pakn.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- NỬA TRÁI: ẢNH & THÔNG TIN HỆ THỐNG -->
+    <div class="split-image">
+        <div class="split-image-overlay"></div>
+
+        <!-- Hiệu ứng nền ánh sáng lan tỏa -->
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+
+        <!-- Canvas tương tác kết nối hạt mạng lưới -->
+        <canvas class="particles" id="particlesCanvas"></canvas>
+
+        <!-- Slogan & Thương hiệu -->
+        <div class="brand-display">
+            <div class="brand-badge">
+                <i class="fas fa-shield-halved"></i>
+                <span>Cổng thông tin phản ánh & kiến nghị</span>
+            </div>
+            <h2 class="brand-title">Sở Giáo dục và Đào tạo<br>Nghệ An</h2>
+            <div class="brand-desc-container">
+                <p class="brand-desc" id="sloganText">Hệ thống tiếp nhận phản ánh, kiến nghị chính thức từ người dân</p>
+            </div>
+        </div>
+
+        <!-- Khung sóng SVG -->
+        <div class="wave-container">
+            <svg class="wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path fill="rgba(255,255,255,0.06)"
+                      d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,218.7C672,235,768,245,864,234.7C960,224,1056,192,1152,176C1248,160,1344,160,1392,160L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+                </path>
+            </svg>
+            <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path fill="rgba(255,255,255,0.04)"
+                      d="M0,288L48,272C96,256,192,224,288,213.3C384,203,480,213,576,229.3C672,245,768,267,864,261.3C960,256,1056,224,1152,208C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+                </path>
+            </svg>
+        </div>
+
+        <div class="split-image-caption">
+            <span>Hệ thống trực tuyến chính thức</span>
+        </div>
+    </div>
+
+    <!-- NỬA PHẢI: FORM ĐĂNG NHẬP (GIAO DIỆN KÍNH FROSTED GLASS) -->
+    <div class="split-form">
+        <div class="login-wrapper" id="loginCard">
+
+            <!-- Logo -->
+            <div class="logo-section">
+                <a href="#" title="Về trang chủ">
+                    <div class="logo-badge">
+                        <img src="~/img/logo_sgd.png" alt="Sở Giáo dục và Đào tạo Nghệ An" class="logo-img">
+                    </div>
+                </a>
+            </div>
+
+            <!-- Title -->
+            <h1 class="main-title">PHẢN ÁNH KIẾN NGHỊ NGHỆ AN</h1>
+
+            <!-- Login Form -->
+            <form action="#" method="post" class="login-form" id="loginForm">
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error-alert" id="demoErrorAlert" style="color: #dc3545; background-color: #f8d7da; border-color: #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 5px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>@ViewBag.Error</span>
+                    </div>
+                }
+
+                <div class="field-group">
+                    <div class="field-wrapper">
+                        <i class="fas fa-user field-icon"></i>
+                        <input type="text" id="username" name="Username" class="field-input" placeholder="Tên đăng nhập"
+                               autocomplete="off" required>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-wrapper">
+                        <i class="fas fa-lock field-icon"></i>
+                        <input type="password" id="password" name="Password" class="field-input" placeholder="Mật khẩu"
+                               autocomplete="off" required>
+                        <button type="button" class="toggle-password" id="togglePassword"
+                                aria-label="Hiển thị/Ẩn mật khẩu">
+                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <span class="btn-text">Đăng nhập</span>
+                </button>
+            </form>
+
+            <!-- SSO -->
+            <div class="sso-divider">
+                <span>hoặc</span>
+            </div>
+
+            <!-- Footer -->
+            <div class="page-footer">
+                <p><strong>Sở Giáo dục và Đào tạo Nghệ An</strong> &nbsp;|&nbsp; Hệ thống Phản ánh Kiến nghị</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="~/js/login-new.js"></script>
+    <!-- Scripts điều khiển tương tác động -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // 3. Hiệu ứng chạy Slogan luân phiên mượt mà ở nửa trái
+            const slogans = [
+                "Hệ thống tiếp nhận phản ánh, kiến nghị chính thức từ người dân",
+                "Theo dõi tiến độ, nhận thông tin phản hồi trực tiếp từ các cấp",
+                "Chung tay vì một môi trường giáo dục minh bạch và phát triển"
+            ];
+            let sloganIndex = 0;
+            const sloganEl = document.getElementById("sloganText");
+
+            if (sloganEl) {
+                setInterval(() => {
+                    sloganEl.style.transition = "opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)";
+                    sloganEl.style.opacity = 0;
+
+                    setTimeout(() => {
+                        sloganIndex = (sloganIndex + 1) % slogans.length;
+                        sloganEl.textContent = slogans[sloganIndex];
+                        sloganEl.style.opacity = 0.9;
+                    }, 600);
+                }, 5000);
+            }
+
+            // 4. Mạng lưới liên kết hạt động (Interactive Connected Particles) trên Canvas
+            const canvas = document.getElementById("particlesCanvas");
+            if (canvas) {
+                const ctx = canvas.getContext("2d");
+                let particles = [];
+                let mouse = { x: null, y: null, radius: 160 };
+
+                function resizeCanvas() {
+                    canvas.width = canvas.parentElement.clientWidth;
+                    canvas.height = canvas.parentElement.clientHeight;
+                }
+
+                resizeCanvas();
+                window.addEventListener("resize", resizeCanvas);
+
+                // Theo dõi chuột trong nửa trái
+                const leftPanel = document.querySelector(".split-image");
+                leftPanel.addEventListener("mousemove", (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = e.clientX - rect.left;
+                    mouse.y = e.clientY - rect.top;
+                });
+
+                leftPanel.addEventListener("mouseleave", () => {
+                    mouse.x = null;
+                    mouse.y = null;
+                });
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.baseSize = Math.random() * 2 + 1;
+                        this.size = this.baseSize;
+                        this.speedX = (Math.random() - 0.5) * 0.5;
+                        this.speedY = (Math.random() - 0.5) * 0.5;
+                        this.density = Math.random() * 20 + 5;
+                    }
+
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+
+                        // Va chạm biên
+                        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+
+                        // Tương tác lực đẩy/hút nhẹ với con trỏ chuột
+                        if (mouse.x !== null && mouse.y !== null) {
+                            let dx = mouse.x - this.x;
+                            let dy = mouse.y - this.y;
+                            let distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance < mouse.radius) {
+                                let force = (mouse.radius - distance) / mouse.radius;
+                                let directionX = (dx / distance) * force * 1.8;
+                                let directionY = (dy / distance) * force * 1.8;
+
+                                this.x += directionX;
+                                this.y += directionY;
+                                this.size = this.baseSize * (1 + force * 1.6);
+                            } else {
+                                if (this.size > this.baseSize) {
+                                    this.size -= 0.05;
+                                }
+                            }
+                        } else {
+                            if (this.size > this.baseSize) {
+                                this.size -= 0.05;
+                            }
+                        }
+                    }
+
+                    draw() {
+                        ctx.fillStyle = "rgba(6, 182, 212, " + (0.35 + (this.size - this.baseSize) * 0.35) + ")";
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Khởi tạo các hạt
+                const particleCount = 80;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+
+                // Vẽ liên kết giữa các hạt có khoảng cách gần
+                function drawLines() {
+                    for (let a = 0; a < particles.length; a++) {
+                        for (let b = a + 1; b < particles.length; b++) {
+                            let dx = particles[a].x - particles[b].x;
+                            let dy = particles[a].y - particles[b].y;
+                            let distance = Math.sqrt(dx * dx + dy * dy);
+
+                            if (distance < 95) {
+                                let alpha = (95 - distance) / 95 * 0.18;
+                                ctx.strokeStyle = "rgba(6, 182, 212, " + alpha + ")";
+                                ctx.lineWidth = 0.8;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[a].x, particles[a].y);
+                                ctx.lineTo(particles[b].x, particles[b].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw();
+                    }
+                    drawLines();
+                    requestAnimationFrame(animate);
+                }
+
+                animate();
+            }
+        });
+    </script>
+</body>
+
+</html>

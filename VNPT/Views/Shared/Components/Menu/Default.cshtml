@@ -1,0 +1,11 @@
+﻿@model IEnumerable<VNPT.Models.MENU>
+
+@foreach (var item in Model)
+{
+    <li class="nav-item">
+        <a class="nav-link collapsed" asp-controller="@item.CONTROLLER_NAME" asp-action="@item.ACTION_NAME">
+            <i class="@item.ICON_CLASS"></i>
+            <span>@item.MENU_TITLE</span>
+        </a>
+    </li>
+}

@@ -1,0 +1,189 @@
+﻿@{
+    ViewData["Title"] = "Quản lý người dùng";
+    // Mặc định nó sẽ tự động nhận _Layout.cshtml làm khung
+}
+
+<div class="pagetitle">
+    <h1>Danh sách tài khoản hệ thống</h1>
+</div>
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0" style="padding:0;">Quản trị viên</h5>
+                        <button type="button" class="btn btn-primary" onclick="openModalAdd()">
+                            <i class="bi bi-plus-circle me-1"></i> Thêm tài khoản
+                        </button>
+                    </div>
+
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 10%">#</th>
+                                <th scope="col" style="width: 30%">Tên tài khoản (Username)</th>
+                                <th scope="col" style="width: 40%">Họ và tên (Fullname)</th>
+                                <th scope="col" style="width: 20%" class="text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Đang tải dữ liệu...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Thêm tài khoản mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="userId" name="ID" value="0" />
+                    <div class="mb-3">
+                        <label class="form-label">Tên tài khoản (Username)</label>
+                        <input type="text" class="form-control" id="txtUsername" name="USERNAME" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" id="lblPassword">Mật khẩu</label>
+                        <input type="password" class="form-control" id="txtPassword" name="PASSWORD" />
+                        <small class="text-muted d-none" id="pwdHelp">Bỏ trống nếu không muốn thay đổi mật khẩu.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên</label>
+                        <input type="text" class="form-control" id="txtFullname" name="FULLNAME" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Lưu lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let uModal;
+        document.addEventListener("DOMContentLoaded", function () {
+            uModal = new bootstrap.Modal(document.getElementById('userModal'));
+            loadUsers();
+        });
+
+        function loadUsers() {
+            fetch('/quan-ly-user/danh-sach')
+                .then(res => res.json())
+                .then(result => {
+                    if (result.success) {
+                        renderTable(result.data);
+                    } else {
+                        alert(result.message);
+                        if (result.message.includes("Hết phiên")) window.location.href = '/Auth/Login';
+                    }
+                })
+                .catch(err => {
+                    console.error("Lỗi:", err);
+                    document.getElementById('userTableBody').innerHTML = `<tr><td colspan="4" class="text-danger text-center">Không thể kết nối đến hệ thống!</td></tr>`;
+                });
+        }
+
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Chưa có tài khoản nào trên hệ thống.</td></tr>';
+                return;
+            }
+            let html = '';
+            users.forEach((user, index) => {
+                html += `
+                    <tr>
+                        <th scope="row">${index + 1}</th>
+                        <td>${user.username}</td>
+                        <td>${user.fullname || ''}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-warning me-1" onclick='openModalEdit(${JSON.stringify(user)})'>
+                                <i class="bi bi-pencil-square"></i> Sửa
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">
+                                <i class="bi bi-trash"></i> Xóa
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function openModalAdd() {
+            document.getElementById('modalTitle').innerText = "Thêm tài khoản mới";
+            document.getElementById('userId').value = "0";
+            document.getElementById('userForm').reset();
+            document.getElementById('txtUsername').disabled = false;
+            document.getElementById('txtPassword').required = true;
+            document.getElementById('pwdHelp').classList.add('d-none');
+            uModal.show();
+        }
+
+        function openModalEdit(user) {
+            document.getElementById('modalTitle').innerText = "Cập nhật tài khoản";
+            document.getElementById('userId').value = user.id;
+            document.getElementById('txtUsername').value = user.username;
+            document.getElementById('txtFullname').value = user.fullname || '';
+            document.getElementById('txtPassword').value = '';
+            document.getElementById('txtUsername').disabled = true;
+            document.getElementById('txtPassword').required = false;
+            document.getElementById('pwdHelp').classList.remove('d-none');
+            uModal.show();
+        }
+
+        function saveUser(event) {
+            event.preventDefault();
+            const form = document.getElementById('userForm');
+            const formData = new FormData(form);
+            if(document.getElementById('userId').value !== "0") {
+                formData.set('USERNAME', document.getElementById('txtUsername').value);
+            }
+            fetch('/quan-ly-user/luu', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    uModal.hide();
+                    loadUsers();
+                    Swal.fire({ icon: 'success', title: 'Thành công', text: result.message, timer: 1500, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: result.message });
+                }
+            });
+        }
+
+        function deleteUser(id, username) {
+            if (confirm(`Bạn có chắc muốn xóa "${username}"?`)) {
+                const formData = new FormData();
+                formData.append('id', id);
+                fetch('/quan-ly-user/xoa', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(result => {
+                    Swal.fire({
+                        icon: result.success ? 'success' : 'error',
+                        title: result.success ? 'Đã xóa' : 'Thất bại',
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    if (result.success) loadUsers();
+                });
+            }
+        }
+    </script>
+}
