@@ -76,6 +76,7 @@
 @section Scripts {
     <script>
         let uModal;
+        const isAdmin = '@Context.Session.GetString("Role")'.toLowerCase() === 'admin';
         document.addEventListener("DOMContentLoaded", function () {
             uModal = new bootstrap.Modal(document.getElementById('userModal'));
             loadUsers();
@@ -115,9 +116,11 @@
                             <button class="btn btn-sm btn-warning me-1" onclick='openModalEdit(${JSON.stringify(user)})'>
                                 <i class="bi bi-pencil-square"></i> Sửa
                             </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">
-                                <i class="bi bi-trash"></i> Xóa
-                            </button>
+                            ${isAdmin ? `
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+                    ` : ''}
                         </td>
                     </tr>
                 `;

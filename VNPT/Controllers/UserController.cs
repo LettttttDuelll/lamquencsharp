@@ -114,7 +114,11 @@ namespace VNPT.Controllers
             {
                 return Ok(new GenericResult { Success = false, Message = "Bạn không có quyền thực hiện thao tác này!" });
             }
-
+            var role = HttpContext.Session.GetString("Role");
+            if (string.IsNullOrEmpty(role) || role.ToLower() != "admin")
+            {
+                return Json(new { success = false, message = "Bạn không có quyền thực hiện chức năng này!" });
+            }
             try
             {
                 var user = _db.USER.FirstOrDefault(x => x.ID == id);
