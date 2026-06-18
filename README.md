@@ -1,3 +1,3 @@
 # lamquenc#
 tk: admin
-    123
+pass: 123
