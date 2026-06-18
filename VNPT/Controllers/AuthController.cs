@@ -39,7 +39,7 @@ namespace VNPT.Controllers
                 return RedirectToAction("Index","Home");
             }
         }
-        [HttpPost] 
+        [HttpPost]
         public ActionResult Login(USER u) // 'u' này chứa USERNAME và PASSWORD người dùng vừa gõ từ màn hình
         {
             // CHỖ XỬ LÝ LOGIC 1: Kiểm tra xem người dùng có bỏ trống ô nào không
@@ -53,16 +53,17 @@ namespace VNPT.Controllers
             // Câu lệnh này dịch ra tiếng người là: "Tìm trong bảng USER xem có ông nào trùng cả USERNAME và PASSWORD không"
             string hashedInput = Common.toMD5.GetMd5Hash(u.PASSWORD);
 
-            var obj = _db.USER.FirstOrDefault(x => x.USERNAME.Equals(u.USERNAME) && x.PASSWORD.Equals(hashedInput)&& x.ISDELETED==0);
+            var obj = _db.USER.FirstOrDefault(x => x.USERNAME.Equals(u.USERNAME) && x.PASSWORD.Equals(hashedInput) && x.ISDELETED == 0);
 
             // CHỖ XỬ LÝ LOGIC 3: Kiểm tra kết quả từ Database trả về
             if (obj != null)
             {
                 // Nếu tìm thấy (obj khác null) -> ĐÚNG USERNAME VÀ PASSWORD
                 // Tiến hành cấp "vé thông hành" (Session) cho người dùng
-               HttpContext.Session.SetString("USERNAME", obj.USERNAME);
-               //HttpContext.Session.SetString("FULLNAME", obj.FULLNAME ?? obj.USERNAME);
-               HttpContext.Session.SetString("FULLNAME", obj.FULLNAME);
+                HttpContext.Session.SetString("USERNAME", obj.USERNAME);
+                //HttpContext.Session.SetString("FULLNAME", obj.FULLNAME ?? obj.USERNAME);
+                HttpContext.Session.SetString("FULLNAME", obj.FULLNAME);
+                HttpContext.Session.SetString("ROLE", obj.ROLE ?? "USER");
                 // Chuyển hướng họ vào trang chủ (Trang Home)
                 return RedirectToAction("Index", "Home");
             }

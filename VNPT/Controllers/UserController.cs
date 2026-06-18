@@ -30,7 +30,8 @@ namespace VNPT.Controllers
         }
 
         [HttpGet("danh-sach")]
-        public IActionResult GetAll() {
+        public IActionResult GetAll()
+        {
             if (HttpContext.Session.GetString("USERNAME") == null)
             {
                 return Ok(new GenericResult { Success = false, Message = "Hết phiên đăng nhập. Vui lòng đăng nhập lại!" });
@@ -141,7 +142,74 @@ namespace VNPT.Controllers
                 return Ok(new GenericResult { Success = false, Message = "Lỗi khi xóa tài khoản: " + ex.Message });
             }
         }
-    }
 
+        [HttpGet]
+        [Route("doi-mat-khau")] // Đường dẫn sẽ là: /quan-ly-user/doi-mat-khau
+        public IActionResult ChangePassword()
+        {
+            // Kiểm tra session nếu chưa login thì đá về trang Login luôn
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("USERNAME")))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            return View(); // Trả về file giao diện DoiMatKhau.cshtml
+        }
+
+        [HttpPost]
+        [Route("doi-mat-khau")]
+        public IActionResult changePassword(string oldPassword, string newPassword)
+        {
+            var currentUsername = HttpContext.Session.GetString("USERNAME");
+            if (string.IsNullOrEmpty(currentUsername))
+            {
+                return Ok(new GenericResult { Success = false, Message = "Hết phiên làm việc" });
+            }
+            var u = _db.USER.FirstOrDefault(x => x.USERNAME.Equals(currentUsername) && x.ISDELETED == 0);
+            // CHỖ XỬ LÝ LOGIC 1: Kiểm tra xem người dùng có bỏ trống ô nào không
+            if (string.IsNullOrEmpty(oldPassword) || string.IsNullOrEmpty(newPassword))
+            {
+                return Ok(new GenericResult { Success = false, Message = "Vui lòng điền đầy đủ thông tin!" });
+            }
+
+            string hashedInput = Common.toMD5.GetMd5Hash(oldPassword);
+
+            // CHỖ XỬ LÝ LOGIC 3: Kiểm tra kết quả từ Database trả về
+            if (!hashedInput.Equals(u.PASSWORD))
+            {
+                return Ok(new GenericResult { Success = false, Message = "Mật khẩu cũ không đúng " });
+            }
+            u.PASSWORD = Common.toMD5.GetMd5Hash(newPassword);
+            _db.USER.Update(u);
+            _db.SaveChanges();
+            return Ok(new GenericResult { Success = true, Message = "Đổi mật khẩu thành công " });
+        }
+
+        [HttpPost]
+        [Route("reset-password")]
+        public IActionResult ResetPassword(int id)
+        {
+            var currentUsername = HttpContext.Session.GetString("USERNAME");
+            if (string.IsNullOrEmpty(currentUsername))
+            {
+                return Ok(new GenericResult { Success = false, Message = "Hết phiên làm việc" });
+            }
+            var role = HttpContext.Session.GetString("ROLE");
+            if (string.IsNullOrEmpty(role) || role.ToLower() != "admin")
+            {
+                return Ok(new GenericResult { Success = false, Message = "Bạn không có quyền thực hiện chức năng này!" });
+            }
+            var u = _db.USER.FirstOrDefault(x => x.ID == id && x.ISDELETED == 0);
+            if (u == null)
+            {
+                return Ok(new GenericResult { Success = false, Message = "Không tìm thấy tài khoản cần reset!" });
+            }
+            u.PASSWORD = Common.toMD5.GetMd5Hash("123");
+            _db.USER.Update(u);
+            _db.SaveChanges();
+            return Ok(new GenericResult { Success = true, Message = "Đã reset mật khẩu về 123 thành công!" });
+
+        }
+    }
 }
 

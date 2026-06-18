@@ -76,7 +76,7 @@
 @section Scripts {
     <script>
         let uModal;
-        const isAdmin = '@Context.Session.GetString("Role")'.toLowerCase() === 'admin';
+        const isAdmin = '@Context.Session.GetString("ROLE")'.toLowerCase() === 'admin';
         document.addEventListener("DOMContentLoaded", function () {
             uModal = new bootstrap.Modal(document.getElementById('userModal'));
             loadUsers();
@@ -119,6 +119,9 @@
                             ${isAdmin ? `
                         <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">
                             <i class="bi bi-trash"></i> Xóa
+                        </button>
+                        <button class="btn btn-sm btn-info" onclick="resetUser(${user.id}, '${user.username}')" title="Đặt lại mật khẩu">
+                            <i class="bi bi-shield-lock me-1"></i> Reset
                         </button>
                     ` : ''}
                         </td>
@@ -180,6 +183,25 @@
                     Swal.fire({
                         icon: result.success ? 'success' : 'error',
                         title: result.success ? 'Đã xóa' : 'Thất bại',
+                        text: result.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    if (result.success) loadUsers();
+                });
+            }
+        }
+
+        function resetUser(id, username) {
+            if (confirm(`Bạn có chắc muốn reset "${username}"?`)) {
+                const formData = new FormData();
+                formData.append('id', id);
+                fetch('/quan-ly-user/reset-password', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(result => {
+                    Swal.fire({
+                        icon: result.success ? 'success' : 'error',
+                        title: result.success ? 'Đã reset' : 'Thất bại',
                         text: result.message,
                         timer: 1500,
                         showConfirmButton: false
