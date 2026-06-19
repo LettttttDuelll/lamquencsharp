@@ -68,8 +68,8 @@ app.UseSession();//session middware
 
 app.UseRouting();
 
-app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: Nhận diện Token trước
-app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau
+app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: login trước
+app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra phân quyền sau
 
 //app.UseEndpoints(async EndPoint=>
 //{
