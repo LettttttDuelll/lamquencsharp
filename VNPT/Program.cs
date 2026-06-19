@@ -1,13 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 using System.Net;
+using System.Text;
+using VNPT;
 using VNPT.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Đăng ký JwtService vào hệ thống DI
+builder.Services.AddScoped<VNPT.Service.JwtService>();
+
+//configure jwt settings
+var jwtSettings = new Jwtsettings();
+builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+builder.Services.AddSingleton(jwtSettings);
+
+//configure jwt authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+    };
+}
+);
+
+builder.Services.AddAuthorization();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// THÊM ĐOẠN NÀY: Đăng ký TestDBContext sử dụng SQLite
+// Đăng ký TestDBContext sử dụng SQLite
 builder.Services.AddDbContext<TestDBContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -28,11 +63,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
 app.UseSession();//session middware
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: Nhận diện Token trước
+app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau
 
 //app.UseEndpoints(async EndPoint=>
 //{
@@ -75,10 +112,5 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
     }
 }
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Auth}/{action=Index}/{id?}");
-
-app.Run();
 
 app.Run();

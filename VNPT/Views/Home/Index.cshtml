@@ -14,6 +14,15 @@
                 <div class="card-body mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0" style="padding:0;">Quản trị viên</h5>
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" id="txtSearch" class="form-control border-start-0 ps-0"
+                                       placeholder="Nhập tài khoản hoặc họ tên để tìm..." oninput="filterTable()">
+                            </div>
+                        </div>
                         <button type="button" class="btn btn-primary" onclick="openModalAdd()">
                             <i class="bi bi-plus-circle me-1"></i> Thêm tài khoản
                         </button>
@@ -83,6 +92,13 @@
         });
 
         function loadUsers() {
+
+            if(document.getElementById('txtSearch')) {
+                document.getElementById('txtSearch').value = '';
+             }
+
+        fetch('/quan-ly-user/danh-sach')
+            .then(res => res.json())
             fetch('/quan-ly-user/danh-sach')
                 .then(res => res.json())
                 .then(result => {
@@ -130,6 +146,30 @@
             });
             tbody.innerHTML = html;
         }
+
+        function filterTable() {
+                // 1. Lấy từ khóa người dùng gõ vào và chuyển về chữ thường
+                const keyword = document.getElementById('txtSearch').value.toLowerCase().trim();
+
+                // 2. Lấy toàn bộ các dòng (tr) đang có trong tbody
+                const rows = document.querySelectorAll('#userTableBody tr');
+
+                rows.forEach(row => {
+                    // Nếu là dòng hiển thị "Đang tải dữ liệu..." hoặc "Chưa có tài khoản" thì bỏ qua không lọc
+                    if (row.cells.length === 1) return;
+
+                    // 3. Lấy text ở cột Tài khoản (ô thứ 2) và Họ tên (ô thứ 3)
+                    const username = row.cells[1] ? row.cells[1].innerText.toLowerCase() : '';
+                    const fullname = row.cells[2] ? row.cells[2].innerText.toLowerCase() : '';
+
+                    // 4. Nếu trúng từ khóa thì HIỆN, không trúng thì ẨN
+                    if (username.includes(keyword) || fullname.includes(keyword)) {
+                        row.style.display = ''; // Hiện dòng
+                    } else {
+                        row.style.display = 'none'; // Ẩn dòng
+                    }
+                });
+            }
 
         function openModalAdd() {
             document.getElementById('modalTitle').innerText = "Thêm tài khoản mới";
