@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using VNPT.Common;
 using VNPT.Models;
 using VNPT.Models.Data;
-using VNPT.Common;
 
 namespace VNPT.Controllers
 {
+    [Authorize]
     [Route("quan-ly-user")]
     public class UserController : Controller
     {

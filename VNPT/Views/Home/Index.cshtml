@@ -90,16 +90,26 @@
             uModal = new bootstrap.Modal(document.getElementById('userModal'));
             loadUsers();
         });
-
+        function getJwtToken() {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; jwt_token=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return "";
+        }
         function loadUsers() {
 
             if(document.getElementById('txtSearch')) {
                 document.getElementById('txtSearch').value = '';
              }
 
-        fetch('/quan-ly-user/danh-sach')
-            .then(res => res.json())
-            fetch('/quan-ly-user/danh-sach')
+            fetch('/quan-ly-user/danh-sach',{
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + getJwtToken() // Đính kèm token gác cổng
+                }
+            })
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
@@ -200,7 +210,9 @@
             if(document.getElementById('userId').value !== "0") {
                 formData.set('USERNAME', document.getElementById('txtUsername').value);
             }
-            fetch('/quan-ly-user/luu', { method: 'POST', body: formData })
+            fetch('/quan-ly-user/luu', { method: 'POST',headers: {
+                    'Authorization': 'Bearer ' + getJwtToken() // Đính kèm token gác cổng
+                }, body: formData })
             .then(res => res.json())
             .then(result => {
                 if (result.success) {
@@ -217,7 +229,9 @@
             if (confirm(`Bạn có chắc muốn xóa "${username}"?`)) {
                 const formData = new FormData();
                 formData.append('id', id);
-                fetch('/quan-ly-user/xoa', { method: 'POST', body: formData })
+                fetch('/quan-ly-user/xoa', { method: 'POST',headers: {
+                    'Authorization': 'Bearer ' + getJwtToken() // Đính kèm token gác cổng
+                }, body: formData })
                 .then(res => res.json())
                 .then(result => {
                     Swal.fire({
@@ -236,7 +250,9 @@
             if (confirm(`Bạn có chắc muốn reset "${username}"?`)) {
                 const formData = new FormData();
                 formData.append('id', id);
-                fetch('/quan-ly-user/reset-password', { method: 'POST', body: formData })
+                fetch('/quan-ly-user/reset-password', { method: 'POST', body: formData ,headers: {
+                    'Authorization': 'Bearer ' + getJwtToken() // Đính kèm token gác cổng
+                }})
                 .then(res => res.json())
                 .then(result => {
                     Swal.fire({

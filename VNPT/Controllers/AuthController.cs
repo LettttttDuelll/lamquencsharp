@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VNPT.Models;
 using VNPT.Models.Data;
+using VNPT.Service;
 
 namespace VNPT.Controllers
 {
@@ -8,13 +9,14 @@ namespace VNPT.Controllers
     {
 
         private readonly ILogger<AuthController> _logger;//DI
-
         private readonly TestDBContext _db;
+        private readonly JwtService _jwtService;
 
-        public AuthController(ILogger<AuthController> logger, TestDBContext db )
+        public AuthController(ILogger<AuthController> logger, TestDBContext db , JwtService jwtService)
         {
             _logger = logger;
             _db = db;
+            _jwtService = jwtService;
         }
 
         public IActionResult Index()
@@ -65,6 +67,14 @@ namespace VNPT.Controllers
                 HttpContext.Session.SetString("FULLNAME", obj.FULLNAME);
                 HttpContext.Session.SetString("ROLE", obj.ROLE ?? "USER");
                 // Chuyển hướng họ vào trang chủ (Trang Home)
+                var token = _jwtService.GenerateToken(obj.USERNAME, obj.ROLE);
+
+                // Gói token vào cookie tên là "jwt_token", lưu trong vòng 30 phút
+                Response.Cookies.Append("jwt_token", token, new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(30),
+                    HttpOnly = false // Để false thì JavaScript ở giao diện mới đọc được tấm vé này
+                });
                 return RedirectToAction("Index", "Home");
             }
 
@@ -77,6 +87,7 @@ namespace VNPT.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            Response.Cookies.Delete("jwt_token");
             return RedirectToAction("Index");
         }
 
