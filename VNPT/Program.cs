@@ -68,7 +68,7 @@ app.UseSession();//session middware
 app.UseRouting();
 
 app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: Nhận diện Token trước, xem bạn là ai
-app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau, xem bạn có quyền hạn gì
+app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau, xem bạn có quyền hạn gìgi
 
 app.MapControllerRoute(
     name: "default",
@@ -78,31 +78,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<VNPT.Models.Data.TestDBContext>();
-
-    //// Kiểm tra xem bảng USERS đã có dữ liệu chưa
-    //if (!context.USER.Any())
-    //{
-    //// Nếu chưa có, tự động thêm 1 tài khoản admin/123456
-    //context.USER.Add(new VNPT.Models.USER
-    //{
-    //USERNAME = "admin",
-    //PASSWORD = VNPT.Common.toMD5.GetMd5Hash("123"), // Tạm thời để pass thô, khi nào làm hàm băm MD5 thì sửa sau
-    //FULLNAME = "Quản Trị Viên",
-    //ISDELETED = 0
-    //       });
-    //context.SaveChanges(); // Lưu vào file sqlite
-    //    }
-    //}
-    // ------------------------------------------------
-    if (!context.MENU.Any())
-    {
-        context.MENU.AddRange(new List<VNPT.Models.MENU>
-    {
-        new VNPT.Models.MENU { MENU_NAME = "QL_USER", MENU_TITLE = "Quản lý người dùng", CONTROLLER_NAME = "User", ACTION_NAME = "Index", ICON_CLASS = "bi bi-people" },
-        new VNPT.Models.MENU { MENU_NAME = "QL_MENU", MENU_TITLE = "Quản lý menu", CONTROLLER_NAME = "Menu", ACTION_NAME = "Index", ICON_CLASS = "bi bi-menu-button-wide" }
-    });
         context.SaveChanges();
     }
-}
 
 app.Run();
