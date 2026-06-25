@@ -9,7 +9,6 @@ using VNPT.Models.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Đăng ký JwtService vào hệ thống DI
 builder.Services.AddScoped<VNPT.Service.JwtService>();
 
 //configure jwt settings
@@ -68,20 +67,13 @@ app.UseSession();//session middware
 
 app.UseRouting();
 
-app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: Nhận diện Token trước
-app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau
-
-//app.UseEndpoints(async EndPoint=>
-//{
-//    await context.Response.WriteAsync("Hello world");
-//});
-
+app.UseAuthentication(); // ĐƯA LÊN TRƯỚC: Nhận diện Token trước, xem bạn là ai
+app.UseAuthorization();  // ĐƯA XUỐNG SAU: Kiểm tra quyền sau, xem bạn có quyền hạn gì
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Index}/{id?}");
 
-// --- ĐOẠN CODE TỰ ĐỘNG TẠO TÀI KHOẢN ADMIN MẪU ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

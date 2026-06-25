@@ -106,9 +106,6 @@ namespace VNPT.Controllers
             }
         }
 
-        // =========================================================================
-        // 4. API XÓA MỀM USER (Bảo mật bằng Session trực tiếp)
-        // =========================================================================
         [HttpPost("xoa")]
         public IActionResult DeleteData([FromForm] int id)
         {
